@@ -46,23 +46,25 @@
 	function calculervar(prix){
 	var variation = (prix[2] - prix[1])/prix[1]*100;
 	variation = variation.toFixed(2);
-	console.log(variation);
+
 	prix.splice(3, 1 , variation);
 	return prix;
 	}
 
 	function nvprix(message){
+
 		var touteslesbiere =[];
-		for (var i = 0; i <= 0; i++) {
-		var vieuxprix = message[i]['oldprice']/100;
-		var nouveauprix = message[i]['price']/100;
-		biere = [message[i]['name'],vieuxprix, nouveauprix, 0];
-		biere = calculervar(biere);
-		touteslesbiere.push(biere);
-	}
+		for (var i = 0; i < message.length; i++) {
+			var vieuxprix = message[i]['originalPrice']/100;
+			var nouveauprix = message[i]['price']/100;
+			biere = [message[i]['name'],vieuxprix, nouveauprix, 0];
+			biere = calculervar(biere);
+			touteslesbiere.push(biere);
+		}
 	touteslesbiere.sort(function(a,b){return a[2]-b[2];});
+
 	return touteslesbiere
-}
+	}
 
 
 	function afficherprix(ordre)
@@ -75,35 +77,42 @@
 			}else{
 				text= text +'</td><td>'+biere[3]+'%</td><td><img src="./red_arrow.jpg" width="30" height="30"/></td>';
 			}
-			console.log(text);
+
 			document.getElementById(i).innerHTML = text;
 		}
 	}
 
 
+ setTimeout(function(){ requete(); }, 1000);
 
-function requete(){
+function requete() {
 
-       $.get(
-    'http://wallstreet.crichard.fr/api/beers', // Le fichier cible côté serveur.
-    'false', // Nous utilisons false, pour dire que nous n'envoyons pas de données.
-    'miseajourprix', // Nous renseignons uniquement le nom de la fonction de retour.
-    'json' // Format des données reçues.
-);
+        var parameters = {
+            method:'GET',
+        }
+
+
+            fetch('http://wallstreet.crichard.fr/api/beers').then( (response) => {
+		response.text().then( (text) => {miseajourprix(text);});
+
+        });
+
+
+
+
+}
+       //setInterval(requete,1000);
+   
 
 function miseajourprix(texte_recu){
+
 	reponse = JSON.parse(texte_recu);
 
-	console.log('requete effectué')
-	console.log(texte_reçu);
+	console.log('requete effectué');
+
 	tablglobal = nvprix(reponse);
 	afficherprix(tablglobal);
 }
-
-}
-       setInterval(requete,1000);
-   
-
 
       /* 
 
